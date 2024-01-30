@@ -616,7 +616,10 @@ def measure(state_vector, obs_list):
         result = job.result()
         counts = result.get_counts(transpiled_circuit)
         # Extract the measurement result
-        measurement_result = list(counts.keys())[0]
+        measurement_result = list(counts.keys())[0][::-1]
+        ## In Qiskit's result string, the rightmost character represents 
+        ## the state of the first quantum bit,
+        ## while the leftmost character represents the state of the last quantum bit.
         results.append(measurement_result)
 
     return results
@@ -858,30 +861,6 @@ class ClassicalShadowTransformer(torch.nn.Module):
         with open(os.path.join(save_path, filename), 'wb') as file:
             pickle.dump(data_to_save, file)
 
-
-
-    # def optimize(self, steps, max_steps=1000, n_sample=1000, lr=0.0001, autosave=10, **kwargs):
-    #     for pg in self.optimizer.param_groups:
-    #         pg['lr'] = lr
-    #     self.transformer.train()
-        
-    #     for step in range(max_steps):
-    #         if step >= steps and self.can_stop(**kwargs):
-    #             break
-    #         self.optimizer.zero_grad()
-    #         obs,out=self.shadowmeasure(n_sample)
-    #         shadow = Shadow(obs,out).to(self.device)
-    #         loss, logprob, kld = self.loss(shadow)
-    #         loss.backward()
-    #         self.optimizer.step()
-    #         self.loss_history.append(loss.item())
-    #         clear_output(wait=True)
-    #         print(self.path + '/' + self.file)
-    #         print(f'{step:3d}: {loss.item():8.5f} {logprob.item():8.5f} {kld.item():8.5f} {self.transformer.repara.logvar.mean().item():8.5f}')
-    #         if autosave!=0 and (step+1)%autosave == 0:
-    #             self.save()
-    #     if autosave:
-    #         self.save()
 
     def optimize(self, steps, max_steps=1000, n_sample=1000, lr=0.0001, autosave=10, **kwargs):
         for pg in self.optimizer.param_groups:
